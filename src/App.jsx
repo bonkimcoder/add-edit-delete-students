@@ -3,6 +3,8 @@ import { useState } from "react";
 import Form from "./components/Form";
 import { RiArrowLeftDoubleFill, RiArrowRightDoubleFill } from "react-icons/ri";
 import Button from "./components/Button";
+import ConfirmationModal from "./components/ConfirmationModal";
+import StudentDetails from "./components/StudentDetails";
 
 const App = () => {
   const [students, setStudents] = useState(
@@ -28,8 +30,11 @@ const App = () => {
   const [editId, setEditId] = useState(null);
   const [checkAll, setCheckAll] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-
   const [currentPage, setCurrentPage] = useState(1);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [deleteStudentId, setDeleteStudentId] = useState(null);
+  const [multiDeleteIds, setMultiDeleteIds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 20;
   const totalPages = Math.ceil(students.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -43,7 +48,15 @@ const App = () => {
     setCurrentPage(page);
   };
 
-  const studentsToShow = students.slice(startIndex, endIndex);
+  const studentsToShow = students
+    .filter(
+      (student) =>
+        student.fname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.lname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.phone.includes(searchQuery) ||
+        student.email.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(startIndex, endIndex);
 
   const paginationButtons = [];
   for (let i = 1; i <= totalPages; i++) {
@@ -100,22 +113,57 @@ const App = () => {
     );
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm(`Are you sure you want to delete student?`)) {
-      setStudents(students.filter((student) => student.id !== id));
+  const handleConfirmDelete = () => {
+    if (deleteStudentId !== null) {
+      setStudents(students.filter((student) => student.id !== deleteStudentId));
+      setDeleteStudentId(null);
+      setShowConfirmationModal(false);
+    }
+    if (multiDeleteIds.length > 0) {
+      setStudents(
+        students.filter((student) => !multiDeleteIds.includes(student.id))
+      );
+      setMultiDeleteIds([]);
+      setShowConfirmationModal(false);
     }
   };
 
+  const handleCancelDelete = () => {
+    setDeleteStudentId(null);
+    setMultiDeleteIds([]);
+    setShowConfirmationModal(false);
+  };
+
+  const handleDelete = (id) => {
+    setDeleteStudentId(id);
+    setShowConfirmationModal(true);
+  };
+
   const handleMultiDelete = () => {
-    if (window.confirm(`Delete Multiple Students?`)) {
-      setStudents(students.filter((student) => !student.isChecked));
+    const selectedIds = students
+      .filter((student) => student.isChecked)
+      .map((student) => student.id);
+    if (selectedIds.length > 0) {
+      setMultiDeleteIds(selectedIds);
+      setShowConfirmationModal(true);
+    } else {
+      alert("No Student Selected");
     }
   };
 
   return (
     <div className="relative overflow-x-auto sm:rounded-lg mx-auto mt-8 w-10/12">
       <div className="flex my-5 justify-between w-full">
-        <h1 className="text-xl font-bold">All Students</h1>
+        <div className="flex gap-8 justify-center items-center">
+          <h1 className="text-xl font-bold">All Students</h1>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="block p-2 mr-5 text-sm text-gray-900 bg-transparent border-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer rounded-lg"
+            placeholder="Search"
+          />
+        </div>
         <Button
           handleButtonClick={() => setFormVisible(true)}
           text="New Student"
@@ -207,8 +255,7 @@ const App = () => {
           text="Prev"
           display="flex justify-between items-center"
         />
-
-        {paginationButtons}
+        <div>{paginationButtons}</div>
 
         <Button
           handleButtonClick={handleNext}
@@ -245,6 +292,16 @@ const App = () => {
           Total Students: {students.length}
         </p>
       </div>
+
+      {showConfirmationModal && (
+        <ConfirmationModal
+          message={`Are you sure you want to delete ${
+            deleteStudentId !== null ? "this student?" : "selected students?"
+          }`}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
     </div>
   );
 };
