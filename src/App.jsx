@@ -119,7 +119,8 @@ const App = () => {
         <Button
           handleButtonClick={() => setFormVisible(true)}
           text="New Student"
-          color="blue"
+          color_1="#1d4ed8"
+          color_2="#172f74"
         />
       </div>
       <table className="w-full mx-auto text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -182,12 +183,14 @@ const App = () => {
               <td className="px-6 flex gap-6 py-4 bg-gray-50 dark:bg-gray-800">
                 <Button
                   handleButtonClick={() => handleEdit(student.id)}
-                  color="yellow"
+                  color_1="#a16207"
+                  color_2="#856436"
                   text="Edit"
                 />
                 <Button
                   handleButtonClick={() => handleDelete(student.id)}
-                  color="red"
+                  color_1="#b91c1c"
+                  color_2="882525"
                   text="Delete"
                 />
               </td>
@@ -198,7 +201,8 @@ const App = () => {
       <div className="flex gap-8 justify-center my-5">
         <Button
           handleButtonClick={handlePrev}
-          color="blue"
+          color_1="#1d4ed8"
+          color_2="#172f74"
           left_arrow={<RiArrowLeftDoubleFill size={25} />}
           text="Prev"
           display="flex justify-between items-center"
@@ -208,7 +212,8 @@ const App = () => {
 
         <Button
           handleButtonClick={handleNext}
-          color="blue"
+          color_1="#1d4ed8"
+          color_2="#172f74"
           right_arrow={<RiArrowRightDoubleFill size={25} />}
           text="Next"
           display="flex justify-between items-center"
@@ -231,7 +236,8 @@ const App = () => {
       <div className="flex my-5 justify-between items-center w-full">
         <Button
           handleButtonClick={handleMultiDelete}
-          color="red"
+          color_1="#b91c1c"
+          color_2="#882525"
           text="Multi Delete"
         />
 
